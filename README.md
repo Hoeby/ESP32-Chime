@@ -13,4 +13,4 @@ The 433mhz transmitter which can be used
 
 The Byron 23513 which can be modified (warranty is gone, your own responsibility when doing this)
 
-<img src="assets/Readme_home_pictures/byron_dby-23513.jpg" width="50" >
+<img src="assets/Readme_home_pictures/byron_dby-23513.jpg" width="150" >
