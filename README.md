@@ -2,7 +2,8 @@
 
 How to program the ESP, see repository ESP32-Doorbell
 
-The ESP32-chime is made, to send a 433mhz signal supported by rcswitch library or modify a byron 23513 chime to a wifi chime
+The ESP32-chime is made, to send a 433mhz signal or modify a byron 23513 chime to a wifi chime.
+Both need to be supported by rcswitch library (https://github.com/sui77/rc-switch).
 
 Sending the command http://ip/ring will trigger the code in the esp32 chime.
 This will output the code, which can be send using a 433mhz transmitter, or build in the byron 23513 chime
