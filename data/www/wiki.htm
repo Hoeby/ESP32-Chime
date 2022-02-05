@@ -1,0 +1,117 @@
+<html>
+
+<head>
+    <title>%esp_name%</title>
+    <link href='css/main.css' rel='stylesheet' type='text/css' />
+</head>
+
+<body>
+
+    <h2>ESP Chime wiki page</h2>
+    <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Github link</dt>
+    <dd><a href="https://github.com/Hoeby/" target="_blank">- https://github.com/Hoeby/</a></dd>
+    <hr>
+    <hr>
+
+        <dl>
+            <p style="color:blue">URL's that are supported by the ESP Chime</p>
+            <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chime ring</dt>
+            <dd>- When user/password empty: http://%ipaddr%/ring</dd> 
+            <dd>- When user/password is filled in: http://%esp_uname%:%esp_pass%@%ipaddr%/ring</dd>
+            <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chime reboot</dt>
+            <dd>- When user/password empty: http://%ipaddr%/reboot</dd>
+            <dd>- When user/password is filled in: http://%esp_uname%:%esp_pass%@%ipaddr%/reboot</dd>
+        </dl>
+    <hr>
+    <hr>
+
+    <h3 style="color:#408BDC">&nbsp;&nbsp;Page: ESP Info</h3>
+    <h4>&nbsp;&nbsp;&nbsp;&nbsp;ESP Info</h4>
+        <dl>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Versionbuild:</dt>
+            <dd>- The ESP Chime firmware and date.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wifi SSID:</dt>
+            <dd>- To which SSID is the ESP Chime connected and what is it's RSSI Value.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ip:</dt>
+            <dd>- The IP address, Subnet mask, Default gateway.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CAM:</dt>
+            <dd>- Which board is selected, the GPIO-pinnumber for the RCSwitch, the GPIO-pinnumber for de photomos.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spiffs:</dt>
+            <dd>- The maximum, used and free memory for spiffs.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Server:</dt>
+            <dd>- Sending protocol, IP address server en port number of the server.</dd>
+        </dl>
+
+    <h4>&nbsp;&nbsp;&nbsp;&nbsp;ESP Logging</h4>
+        <dl>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DumpLog</dt>
+            <dd>- Saves the log to a file, on the device which is logged-in.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CleanLog</dt>
+            <dd>- Cleans the log-field.</dd>
+        </dl>
+
+    <hr>
+    <hr>
+
+    <h3 style="color:#408BDC">&nbsp;&nbsp;Page: ESP Settings</h3>
+    <dl>
+        <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WebLog Display Level:</dt>
+        <dd>- Sets the level of log.</dd>
+        <dd>  (None, Error, Warning, Info, Debug)</dd>
+        <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ESP name:</dt>
+        <dd>- Sets the name of the device.</dd>
+        <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Web Userid:</dt>
+        <dd>- Login name for secure login on ESP-chime. If security is not needed, clear this field.</dd>
+        <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Password:</dt>
+        <dd>- Login password for secure login on ESP-chime. If security is not needed, clear this field.</dd>
+        <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Network:</dt>
+        <dd>&#9755; Selected "DHCP" to get network credentials from network.</dd>
+        <dd>&#9755; Select "Fixed" to set your own netwerk credentials.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IP Address:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- Set the IP for the ESP chime.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Subnetmask:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- Set the subnetmask for the ESP chime.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gateway Addr:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- Set the gateway address for the ESP chime.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DNS IPAddress:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- Set the DNS address for the ESP chime.</dd>
+        <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RF transmit settings:</dt>
+        <dd>&#9755; Only settings from the RCswitch library can be used (https://github.com/sui77/rc-switch)</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RF Protocol:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- The number for the RF protocol, see RCswitch library for the number.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RF Pulse:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- The pulse length for the code.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RF Code:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- The code itself (1 or 0), max 32 bit long.</dd>
+        <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Send Protocol:</dt>
+        <dd>&#9755; Sets the protocol how to send chime URL received to server</dd>
+        <dd>  (none, json, mqtt)</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Server IP:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- Set the IP for the server, where the message needs to be send to.</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;  (This function is the same for json and mqtt)</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Server Port:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- Set the port number for the server, where the message needs to be send to.</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;  (This function is the same for json and mqtt)</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Server Userid:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- When using secure connection, user ID/name can be added.</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;  (This optional, is the same for json and mqtt)</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Server Password:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- When using secure connection, password can be added.</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;  (This optional, is the same for json and mqtt)</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Domoticz IDX:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- The Domoticz IDX number of the device which needs to be controlled by ESP Chime.</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;  (This function is the same for json and mqtt)</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Send IDX OFF:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- Is de ESP Chime needs to send an OFF command to Domoticz.</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;  (This function is the same for json and mqtt)</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MQTT subscriber:</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- The MQTT subscriber name to receive the mqtt messages.</dd>
+            <dt style="color:blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MQTT TopicIn::</dt>
+            <dd>&nbsp;&nbsp;&nbsp;&nbsp;- The MQTT topic name, when sending mqtt messages.</dd>
+    </dl>
+
+    <hr>
+    <hr>
+
+</body>
+</html>
