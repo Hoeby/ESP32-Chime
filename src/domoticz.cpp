@@ -1,6 +1,4 @@
-// Project: ESP32-Doorbell
-// Programmers: Jos van der Zande
-//              Paul Hermans
+// Project: ESP32-Chime
 //
 // Domoticz functions sourcefile
 //

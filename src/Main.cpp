@@ -1,6 +1,4 @@
 // Project: ESP32-Doorbell          V2.0 (jan-2021)
-// Programmers: Jos van der Zande
-//              Paul Hermans
 //
 // Main ESP32-Doorbell module
 //
@@ -47,8 +45,11 @@ char RFcode[33] = "";                         // Sedn RF code max 32 bits
 char MQTTsubscriber[20] = "ESP32Chime/Input"; // MQTT MQTTsubscriber name
 char MQTTtopicin[20] = "domoticz/in";         // MQTT Topic name
 
-int RCSWITCH_GPIO_NUM = 12;                   // Set the rcswitch GPIO pin, ESP WROOM
-int PHOTOMOS_GPIO_NUM = 13;                   // Set the photomos GPIO pin, ESP WROOM
+int RCSWITCH_GPIO_Wroom = 12;                 // Set the rcswitch GPIO pin, ESP WROOM
+int PHOTOMOS_GPIO_Wroom = 13;                 // Set the photomos GPIO pin, ESP WROOM
+int RCSWITCH_GPIO_M5_pico = 21;               // Set the rcswitch GPIO pin, ESP M5stamp-pico
+int PHOTOMOS_GPIO_M5_pico = 22;               // Set the photomos GPIO pin, ESP M5stamp-pico
+
 //**************************************************************************************************************************************************
 //**                                                                END SETTINGS END                                                              **
 //**************************************************************************************************************************************************
@@ -132,15 +133,11 @@ void setup() {
 
     // Set outputs
     if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       mySwitch.enableTransmit(12);
-       pinMode(13, OUTPUT);
-       //int RCSWITCH_GPIO_NUM = 12;                   // Set the rcswitch GPIO pin, ESP WROOM
-       //int PHOTOMOS_GPIO_NUM = 13;                   // Set the photomos GPIO pin, ESP WROOM
+       mySwitch.enableTransmit(RCSWITCH_GPIO_Wroom);
+       pinMode(PHOTOMOS_GPIO_Wroom, OUTPUT);
     } else if (strcmp(esp_board, "M5stamp_pico") == 1) {
-       mySwitch.enableTransmit(21);
-       pinMode(22, OUTPUT);
-       //int RCSWITCH_GPIO_NUM = 21;                   // Set the rcswitch GPIO pin, ESP M5Stack-Pico
-       //int PHOTOMOS_GPIO_NUM = 22;                   // Set the photomos GPIO pin, ESP M5Stack-Pico
+       mySwitch.enableTransmit(RCSWITCH_GPIO_M5_pico);
+       pinMode(PHOTOMOS_GPIO_M5_pico, OUTPUT);
     } else {
        mySwitch.enableTransmit(21);
        pinMode(22, OUTPUT);
@@ -149,12 +146,9 @@ void setup() {
     //mySwitch.enableTransmit(RCSWITCH_GPIO_NUM);
     int iRFProtocol = atoi(RFProtocol);
     int iRFPulse = atoi(RFPulse); 
-    //mySwitch.setProtocol(2);
     mySwitch.setProtocol(iRFProtocol);
     mySwitch.setPulseLength(iRFPulse);
-    
-    
-    
+           
     // start mqtt
     if (!strcmp(SendProtocol, "mqtt")) {
         Mqtt_begin();
@@ -222,7 +216,9 @@ void start_ssdp_service() {
 }
 
 void RFsend(const char *State){
+    delay(10);
     //mySwitch.send(State);
     mySwitch.send("00110000101111001101010110010011");
     AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(State) + ")\n");
+    delay(1000);
 }

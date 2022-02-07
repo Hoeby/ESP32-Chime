@@ -1,6 +1,4 @@
 // Project: ESP32-Doorbell
-// Programmers: Jos van der Zande
-//              Paul Hermans
 //
 // Setup module
 //
@@ -166,6 +164,20 @@ String TranslateTemplateVars(const String &var) {
         return VERSION;
     if (var == "esp_board")
         return esp_board;
+    if (var == "RCSWITCH_GPIO") {
+        if (strcmp(esp_board, "ESP_Wroom") == 0) {
+            return F("12");
+        } else {
+            return F("21");
+        }
+    }   
+    if (var == "PHOTOMOS_GPIO") {
+        if (strcmp(esp_board, "ESP_Wroom") == 0) {
+            return F("13");
+        } else {
+            return F("22");
+        }
+    }   
     if (var == "webloglevel")
         return String(webloglevel);
     if (var == "esp_board")

@@ -38,8 +38,10 @@ extern bool reboot;
 extern long rebootdelay;
 extern bool mqtt_initdone;
 
-extern int RCSWITCH_GPIO_NUM;
-extern int PHOTOMOS_GPIO_NUM;
+extern int RCSWITCH_GPIO_Wroom;
+extern int PHOTOMOS_GPIO_Wroom;
+extern int RCSWITCH_GPIO_M5_pico;
+extern int PHOTOMOS_GPIO_M5_pico;
 
 void RFsend(const char *State);
 

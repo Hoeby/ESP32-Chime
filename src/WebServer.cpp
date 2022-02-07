@@ -1,5 +1,4 @@
 // Project: ESP32-Doorbell
-// Programmers: Paul Hermans
 //
 // WebServer module
 // Partly based on: // https://gist.github.com/me-no-dev/d34fba51a8f059ac559bf62002e61aa3
@@ -124,12 +123,10 @@ void WebServerInit(AsyncWebServer *webserver) {
     webserver->on("/logclean", HTTP_GET, LogClean);                  // remove Spiffs logs and clean message array
     webserver->on("/logdump", HTTP_GET, LogDump);                    // dump spiffs logs
     webserver->on("/configdump", HTTP_GET, ConfigDump);              // Dump ESPCHIME Saved configuration
-    webserver->on(
-        "/ConfigFileUploads", HTTP_POST, [](AsyncWebServerRequest *request) { request->send(200); }, ConfigFileUploads);
+    webserver->on("/ConfigFileUploads", HTTP_POST, [](AsyncWebServerRequest *request) { request->send(200); }, ConfigFileUploads);
 
     // CHIME links
     webserver->on("/ring", HTTP_GET, ringChime);
-//    webserver->on("/stream", HTTP_GET, streamJpg);
 
     // serving other static information from SPIFFS
     webserver->serveStatic("/", SPIFFS, "/www/");
@@ -287,8 +284,6 @@ void LogClean(AsyncWebServerRequest *request) {
 }
 
 void ringChime(AsyncWebServerRequest *request) {
-    if (!_webAuth(request))
-        return;
     String msg = F("Ring request received");
     msg += F("\n");
     AddLogMessageI(msg);
@@ -298,10 +293,21 @@ void ringChime(AsyncWebServerRequest *request) {
     request->send(200, "text/html", makePage(esp_name, s));
 
     HTTP_Received("On");
-    digitalWrite(PHOTOMOS_GPIO_NUM, HIGH);
+    if (strcmp(esp_board, "ESP_Wroom") == 0) {
+       //digitalWrite(13, HIGH);
+       digitalWrite(PHOTOMOS_GPIO_Wroom, HIGH);
+    } else {
+       //digitalWrite(22, HIGH);
+       digitalWrite(PHOTOMOS_GPIO_M5_pico, HIGH);
+    }
     RFsend(RFcode);
-    //digitalWrite(RCSWITCH_GPIO_NUM, ledState);
-    digitalWrite(PHOTOMOS_GPIO_NUM, LOW);
+    if (strcmp(esp_board, "ESP_Wroom") == 0) {
+       //digitalWrite(13, LOW);
+       digitalWrite(PHOTOMOS_GPIO_Wroom, LOW);
+    } else {
+       //digitalWrite(22, LOW);
+       digitalWrite(PHOTOMOS_GPIO_M5_pico, LOW);
+    }
     if (!strcmp(SendOff, "yes")) {
         HTTP_Received("Off");
     } else {
