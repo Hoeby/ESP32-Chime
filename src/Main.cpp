@@ -69,6 +69,7 @@ unsigned long MQTT_lasttime;  // MQTT check lasttime
 bool WifiOK = false;          // WiFi status
 bool mqtt_initdone = false;   // MQTT status
 bool reboot = false;          // Pending reboot status
+bool RingActivated = false;   // RingActivated
 long rebootdelay = 0;         // used to calculate the delay
 
 void setup() {
@@ -133,22 +134,22 @@ void setup() {
 
     // Set outputs
     if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       mySwitch.enableTransmit(RCSWITCH_GPIO_Wroom);
-       pinMode(PHOTOMOS_GPIO_Wroom, OUTPUT);
+        mySwitch.enableTransmit(RCSWITCH_GPIO_Wroom);
+        pinMode(PHOTOMOS_GPIO_Wroom, OUTPUT);
     } else if (strcmp(esp_board, "M5stamp_pico") == 1) {
-       mySwitch.enableTransmit(RCSWITCH_GPIO_M5_pico);
-       pinMode(PHOTOMOS_GPIO_M5_pico, OUTPUT);
+        mySwitch.enableTransmit(RCSWITCH_GPIO_M5_pico);
+        pinMode(PHOTOMOS_GPIO_M5_pico, OUTPUT);
     } else {
-       mySwitch.enableTransmit(21);
-       pinMode(22, OUTPUT);
+        mySwitch.enableTransmit(21);
+        pinMode(22, OUTPUT);
     }
 
     //mySwitch.enableTransmit(RCSWITCH_GPIO_NUM);
     int iRFProtocol = atoi(RFProtocol);
-    int iRFPulse = atoi(RFPulse); 
+    int iRFPulse = atoi(RFPulse);
     mySwitch.setProtocol(iRFProtocol);
     mySwitch.setPulseLength(iRFPulse);
-           
+
     // start mqtt
     if (!strcmp(SendProtocol, "mqtt")) {
         Mqtt_begin();
@@ -189,6 +190,30 @@ void loop() {
             WifiOK = true;
             AddLogMessageW(F("WiFi connection restored\n"));
         }
+
+        // Process RingActivated
+        if (RingActivated) {
+            RingActivated = false;
+            HTTP_Received("On");
+            if (strcmp(esp_board, "ESP_Wroom") == 0) {
+                digitalWrite(PHOTOMOS_GPIO_Wroom, HIGH);
+            } else {
+                digitalWrite(PHOTOMOS_GPIO_M5_pico, HIGH);
+            }
+            RFsend(RFcode);
+            if (strcmp(esp_board, "ESP_Wroom") == 0) {
+                digitalWrite(PHOTOMOS_GPIO_Wroom, LOW);
+            } else {
+                digitalWrite(PHOTOMOS_GPIO_M5_pico, LOW);
+            }
+            if (!strcmp(SendOff, "yes")) {
+                HTTP_Received("Off");
+            } else {
+                AddLogMessageI("OFF command to domoticz IDX is not send \n");
+                AddLogMessageI("Ringing chime: OFF \n");
+            }
+        }
+
         // Process MQTT when selected
         if (mqtt_initdone && (millis() > MQTT_lasttime + 500)) {
             Mqtt_Loop();
