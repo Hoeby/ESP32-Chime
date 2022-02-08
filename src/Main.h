@@ -36,6 +36,7 @@ extern char MQTTtopicin[20];
 extern const char BUILD_MAIN[];
 extern bool reboot;
 extern long rebootdelay;
+extern bool RingActivated;
 extern bool mqtt_initdone;
 
 extern int RCSWITCH_GPIO_Wroom;
