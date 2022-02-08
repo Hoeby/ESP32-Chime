@@ -200,7 +200,8 @@ void loop() {
             } else {
                 digitalWrite(PHOTOMOS_GPIO_M5_pico, HIGH);
             }
-            RFsend(RFcode);
+            mySwitch.send(RFcode);
+            AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(RFcode) + ")\n");
             if (strcmp(esp_board, "ESP_Wroom") == 0) {
                 digitalWrite(PHOTOMOS_GPIO_Wroom, LOW);
             } else {
@@ -235,15 +236,7 @@ void start_ssdp_service() {
     const char *nVersion = BUILD_MAIN;
     const char *SerialNumber = "";
     const char *Manufacturer = "ESP32Chime";
-    const char *ManufacturerURL = "https://github.com/Hoeby";
+    const char *ManufacturerURL = "https://github.com/Hoeby/ESP32-Chime";
     mySSDP.begin(SSDP_Name, SerialNumber, modelName, nVersion, Manufacturer, ManufacturerURL);
     AddLogMessageI(F("SSDP started\n"));
-}
-
-void RFsend(const char *State){
-    delay(10);
-    //mySwitch.send(State);
-    mySwitch.send("00110000101111001101010110010011");
-    AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(State) + ")\n");
-    delay(1000);
 }
