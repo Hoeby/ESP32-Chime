@@ -67,3 +67,16 @@ html, body {
 .inline {
 	display: inline
 }
+
+.button {
+	display: inline-block;
+	background-color: #408BDC;
+	border: none;
+	border-radius: 4px;
+	color: white;
+	padding: 6px 30px;
+	text-decoration: none;
+	font-size: 13px;
+	margin: 2px;
+	cursor: pointer;
+	}
