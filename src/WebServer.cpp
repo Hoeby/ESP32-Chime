@@ -286,11 +286,13 @@ void LogClean(AsyncWebServerRequest *request) {
 void ringChime(AsyncWebServerRequest *request) {
     String msg = F("Ring request received \n");
     AddLogMessageI(msg);
-    //String s = F("<h1>");
-    //s += esp_name;
-    //s += F("</h1><p>Ring request received</p>");
-    String s = F("Ring request received");
-    request->send(200, "text/html", makePage(esp_name, s));
+//    String s = F("<h1>");
+//    s += esp_name;
+//    s += F("</h1><p>Ring request received</p>");
+//    String s = F("Ring request received");
+//    request->send(200, "text/html", makePage(esp_name, s));
+    request->send(200, "text/plain", "Ring request received");
+
 
     HTTP_Received("On");
     if (strcmp(esp_board, "ESP_Wroom") == 0) {
