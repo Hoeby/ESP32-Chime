@@ -29,6 +29,6 @@ The 3,5Vdc is on the 3,3Vdc pin. It is a little higher, but my ESP can handle it
 Between the RF-signal and the GPIO i have a photomos relay, this takes out the enable signal of the ESP <br>
 By doing this, you still can use the original push-button, otherwise not <br>
 
-<img src="assets/Readme_home_pictures/20220205_193155_resized.jpg" width="400" >
-<img src="assets/Readme_home_pictures/20220205_193233_resized.jpg" width="400" >
+<img src="assets/Readme_home_pictures/20220205_193155_resized.jpg" width="750" >
+<img src="assets/Readme_home_pictures/20220205_193233_resized.jpg" width="750" >
 
