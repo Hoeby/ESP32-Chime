@@ -19,7 +19,7 @@ String makePage(String title, String contents);
 
 AsyncWebSocket ws("/ws");
 uint LogId = 999;
-String LogMessage[50];  // amount of messages to log
+String LogMessage[50];               // amount of messages to log
 uint LogMessageIndexI = 0;
 uint LogMessageIndexO = 0;
 bool LogMessageSuccess = false;
@@ -27,11 +27,13 @@ unsigned long LogMessage_Send_time;  // time a logmessage was send.
 uint LogMessage_Send_tries = 0;      // number of tries.
 bool LogMessage_NewLine = true;      // remember wether the last line had a \n
 
-String tfile;            // target SPIFFS file
-File hfile;              // target SPIFFS file handle
-bool EspConfig = false;  // target SPIFFS file config?
-bool ChimeConfig = false;  // target SPIFFS file config?
-bool tbin = false;       // target bin file?
+String tfile;                        // target SPIFFS file
+File hfile;                          // target SPIFFS file handle
+bool EspConfig = false;              // target SPIFFS file config?
+bool ChimeConfig = false;            // target SPIFFS file config?
+bool tbin = false;                   // target bin file?
+
+bool RFcomplete = true;              // If custom RF is complete, then RF activate
 
 bool _webAuth(AsyncWebServerRequest *request) {
     /*
@@ -292,20 +294,43 @@ void ringChime(AsyncWebServerRequest *request) {
 }
 
 void custom(AsyncWebServerRequest *request) {
-//http://192.168.xxx.xxx/custom?pulse=1&protocol=712&code=110001101011100101011110111     
-    RFActivated = true;
+//http://192.168.xxx.xxx/custom?protocol=2&pulse=712&code=00110000101111001101010110010011
+    RFcomplete = true;
     int paramsNr = request->params();
     for(int i=0;i<paramsNr;i++){
         AsyncWebParameter* p = request->getParam(i);
         if (i==0){
-            RF_pulse = (p->value());
+            if ((p->name()) == "protocol") {
+                const char* payload = (p->value().c_str());
+                RF_protocol = atol(payload);
+            } else {
+                RFcomplete = false;
+                AddLogMessageI("Protocol value is missing in custom URL \n");
+            }
         } else if (i==1) {
-            RF_protocol = (p->value());
+            if ((p->name()) == "pulse") {
+                const char* payload = (p->value().c_str());
+                RF_pulse = atol(payload);
+            } else {
+                RFcomplete = false;
+                AddLogMessageI("Pulse value is missing in custom URL \n");
+            }
         } else if (i==2) {
-            RF_code = (p->value());
+            if ((p->name()) == "code") {
+                const char* payload = (p->value().c_str());
+                strncpy(RF_code,payload,33);
+            } else {
+                RFcomplete = false;
+                AddLogMessageI("RF code value is missing in custom URL \n");
+            }
         }
     }
-    request->send(200, "text/plain", "RF message received, pulse: " + RF_pulse + ", protocol: " + RF_protocol + ", code: " + RF_code + "");
+    if (RFcomplete) {
+        RFActivated = true;
+        request->send(200, "text/plain", "RF message received, protocol: " + String(RF_protocol) + ", pulse: " + String(RF_pulse) + ", code: " + RF_code + "");
+    } else {
+        request->send(200, "text/plain", "ERROR, RF message received, but string is not correct.");
+    }
 }
 
 void LogDump(AsyncWebServerRequest *request) {

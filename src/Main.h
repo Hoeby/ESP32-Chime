@@ -39,9 +39,9 @@ extern long rebootdelay;
 extern bool RingActivated;
 extern bool mqtt_initdone;
 
-extern String RF_pulse;
-extern String RF_protocol;
-extern String RF_code;
+extern long RF_protocol;
+extern long RF_pulse;
+extern char RF_code[33];
 extern bool RFActivated;
 
 extern int RCSWITCH_GPIO_Wroom;

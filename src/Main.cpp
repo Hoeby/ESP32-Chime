@@ -72,10 +72,11 @@ bool reboot = false;          // Pending reboot status
 bool RingActivated = false;   // RingActivated
 long rebootdelay = 0;         // used to calculate the delay
 
-bool RFActivated = false;     // RFActivated
-String RF_pulse;              // RF Pulse 
-String RF_protocol;           // RF Protocol 
-String RF_code;               // RF Code
+long RF_protocol;             // RF Protocol
+long RF_pulse;                // RF Pulse
+char RF_code[33];             // RF Code
+bool RFActivated = false;     // RF Activated
+
 
 void setup() {
     //EEPROM.begin(200);
@@ -137,24 +138,15 @@ void setup() {
             AddLogMessageW(F("Time not synced yet.. Continuing startup.\n"));
     }
 
-    // Set outputs
+    //Set output photorelay rf-signal
     if (strcmp(esp_board, "ESP_Wroom") == 0) {
-        mySwitch.enableTransmit(RCSWITCH_GPIO_Wroom);
         pinMode(PHOTOMOS_GPIO_Wroom, OUTPUT);
     } else if (strcmp(esp_board, "M5stamp_pico") == 1) {
-        mySwitch.enableTransmit(RCSWITCH_GPIO_M5_pico);
         pinMode(PHOTOMOS_GPIO_M5_pico, OUTPUT);
     } else {
-        mySwitch.enableTransmit(21);
         pinMode(22, OUTPUT);
     }
-
-    //mySwitch.enableTransmit(RCSWITCH_GPIO_NUM);
-    int iRFProtocol = atoi(RFProtocol);
-    int iRFPulse = atoi(RFPulse);
-    mySwitch.setProtocol(iRFProtocol);
-    mySwitch.setPulseLength(iRFPulse);
-
+    
     // start mqtt
     if (!strcmp(SendProtocol, "mqtt")) {
         Mqtt_begin();
@@ -199,17 +191,16 @@ void loop() {
         // Process RFActivated
         if (RFActivated) {
             RFActivated = false;
-            String s = F("Pulse: ");
-            s += RF_pulse;
-            s += F(", Protocol: ");
-            s += RF_protocol;
-            s += F(", Code: ");
-            s += RF_code;
-            s += F(" \n");
-            AddLogMessageI(s);
-            //mySwitch.setProtocol(RF_protocol);
-            //mySwitch.setPulseLength(RF_pulse);
-            //mySwitch.send(RF_code);
+            AddLogMessageI("Protocol: " + String(RF_protocol) + ", Pulse: " + String(RF_pulse) + ", Code: " + String(RF_code) +" \n");           
+            if (strcmp(esp_board, "ESP_Wroom") == 0) {
+                mySwitch.enableTransmit(RCSWITCH_GPIO_Wroom);
+            } else {
+                mySwitch.enableTransmit(RCSWITCH_GPIO_M5_pico);
+            }
+            mySwitch.setProtocol(RF_protocol);
+            mySwitch.setPulseLength(RF_pulse);
+            mySwitch.send(RF_code);
+            mySwitch.disableTransmit();
         }
 
         // Process RingActivated
