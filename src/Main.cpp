@@ -72,6 +72,11 @@ bool reboot = false;          // Pending reboot status
 bool RingActivated = false;   // RingActivated
 long rebootdelay = 0;         // used to calculate the delay
 
+bool RFActivated = false;     // RFActivated
+String RF_pulse;              // RF Pulse 
+String RF_protocol;           // RF Protocol 
+String RF_code;               // RF Code
+
 void setup() {
     //EEPROM.begin(200);
     Serial.begin(115200);
@@ -189,6 +194,22 @@ void loop() {
         if (!WifiOK) {
             WifiOK = true;
             AddLogMessageW(F("WiFi connection restored\n"));
+        }
+
+        // Process RFActivated
+        if (RFActivated) {
+            RFActivated = false;
+            String s = F("Pulse: ");
+            s += RF_pulse;
+            s += F(", Protocol: ");
+            s += RF_protocol;
+            s += F(", Code: ");
+            s += RF_code;
+            s += F(" \n");
+            AddLogMessageI(s);
+            //mySwitch.setProtocol(RF_protocol);
+            //mySwitch.setPulseLength(RF_pulse);
+            //mySwitch.send(RF_code);
         }
 
         // Process RingActivated

@@ -39,12 +39,15 @@ extern long rebootdelay;
 extern bool RingActivated;
 extern bool mqtt_initdone;
 
+extern String RF_pulse;
+extern String RF_protocol;
+extern String RF_code;
+extern bool RFActivated;
+
 extern int RCSWITCH_GPIO_Wroom;
 extern int PHOTOMOS_GPIO_Wroom;
 extern int RCSWITCH_GPIO_M5_pico;
 extern int PHOTOMOS_GPIO_M5_pico;
-
-void RFsend(const char *State);
 
 //-------------------------------------------------------
 // Global Functions

@@ -127,6 +127,7 @@ void WebServerInit(AsyncWebServer *webserver) {
 
     // CHIME links
     webserver->on("/ring", HTTP_GET, ringChime);
+    webserver->on("/custom", HTTP_GET, custom);
 
     // serving other static information from SPIFFS
     webserver->serveStatic("/", SPIFFS, "/www/");
@@ -288,6 +289,23 @@ void ringChime(AsyncWebServerRequest *request) {
     AddLogMessageI(msg);
     RingActivated = true;
     request->send(200, "text/html", makePage(esp_name, msg));
+}
+
+void custom(AsyncWebServerRequest *request) {
+//http://192.168.xxx.xxx/custom?pulse=1&protocol=712&code=110001101011100101011110111     
+    RFActivated = true;
+    int paramsNr = request->params();
+    for(int i=0;i<paramsNr;i++){
+        AsyncWebParameter* p = request->getParam(i);
+        if (i==0){
+            RF_pulse = (p->value());
+        } else if (i==1) {
+            RF_protocol = (p->value());
+        } else if (i==2) {
+            RF_code = (p->value());
+        }
+    }
+    request->send(200, "text/plain", "RF message received, pulse: " + RF_pulse + ", protocol: " + RF_protocol + ", code: " + RF_code + "");
 }
 
 void LogDump(AsyncWebServerRequest *request) {

@@ -17,6 +17,7 @@ void LogClean(AsyncWebServerRequest *request);
 void LogDump(AsyncWebServerRequest *request);
 void ConfigDump(AsyncWebServerRequest *request);
 void ringChime(AsyncWebServerRequest *request);
+void custom(AsyncWebServerRequest *request);
 
 void ConfigFileUploads(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final);
 
