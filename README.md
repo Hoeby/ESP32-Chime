@@ -2,10 +2,10 @@
 
 How to program the ESP, see repository ESP32-Doorbell
 
-The ESP32-chime is made, to send a 433mhz signal or modify a byron 23513 chime to a wifi chime.
+The ESP32-chime is made, to send a 433mhz signal or modify a byron 23513 chime to a wifi chime. <br>
 Both need to be supported by rcswitch library (https://github.com/sui77/rc-switch).
 
-Sending the command http://ip/ring will trigger the code in the esp32 chime.
+Sending the command http://ip/ring will trigger the code in the esp32 chime. <br>
 This will output the code, which can be send using a 433mhz transmitter, or build in the byron 23513 chime
 
 The 433mhz transmitter which can be used
@@ -29,6 +29,6 @@ The 3,5Vdc is on the 3,3Vdc pin. It is a little higher, but my ESP can handle it
 Between the RF-signal and the GPIO i have a photomos relay, this takes out the enable signal of the ESP <br>
 By doing this, you still can use the original push-button, otherwise not <br>
 
-<img src="assets/Readme_home_pictures/20220205_193155_resized.jpg" width="250" > <br>
-<img src="assets/Readme_home_pictures/20220205_193233_resized.jpg" width="250" >
+<img src="assets/Readme_home_pictures/20220205_193155_resized.jpg" width="400" >
+<img src="assets/Readme_home_pictures/20220205_193233_resized.jpg" width="400" >
 
