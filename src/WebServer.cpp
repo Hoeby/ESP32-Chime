@@ -296,34 +296,29 @@ void ringChime(AsyncWebServerRequest *request) {
 void custom(AsyncWebServerRequest *request) {
 //http://192.168.xxx.xxx/custom?protocol=2&pulse=712&code=00110000101111001101010110010011
     RFcomplete = true;
-    int paramsNr = request->params();
-    for(int i=0;i<paramsNr;i++){
-        AsyncWebParameter* p = request->getParam(i);
-        if (i==0){
-            if ((p->name()) == "protocol") {
-                const char* payload = (p->value().c_str());
-                RF_protocol = atol(payload);
-            } else {
-                RFcomplete = false;
-                AddLogMessageI("Protocol value is missing in custom URL \n");
-            }
-        } else if (i==1) {
-            if ((p->name()) == "pulse") {
-                const char* payload = (p->value().c_str());
-                RF_pulse = atol(payload);
-            } else {
-                RFcomplete = false;
-                AddLogMessageI("Pulse value is missing in custom URL \n");
-            }
-        } else if (i==2) {
-            if ((p->name()) == "code") {
-                const char* payload = (p->value().c_str());
-                strncpy(RF_code,payload,33);
-            } else {
-                RFcomplete = false;
-                AddLogMessageI("RF code value is missing in custom URL \n");
-            }
-        }
+    if (request->hasParam("protocol")) {
+        AsyncWebParameter* p = request->getParam("protocol");
+        const char* payload = (p->value().c_str());
+        RF_protocol = atol(payload);            
+    } else {
+        RFcomplete = false;
+        AddLogMessageI("Protocol value is missing in custom URL \n");
+    }
+    if (request->hasParam("pulse")) {
+        AsyncWebParameter* p = request->getParam("pulse");
+        const char* payload = (p->value().c_str());
+        RF_pulse = atol(payload);
+    } else {
+        RFcomplete = false;
+        AddLogMessageI("Pulse value is missing in custom URL \n");
+    }
+    if (request->hasParam("code")) {
+        AsyncWebParameter* p = request->getParam("code");
+        const char* payload = (p->value().c_str());
+        strncpy(RF_code,payload,33);
+    } else {
+        RFcomplete = false;
+        AddLogMessageI("RF code value is missing in custom URL \n");
     }
     if (RFcomplete) {
         RFActivated = true;
