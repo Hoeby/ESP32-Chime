@@ -299,7 +299,7 @@ void custom(AsyncWebServerRequest *request) {
     if (request->hasParam("protocol")) {
         AsyncWebParameter* p = request->getParam("protocol");
         const char* payload = (p->value().c_str());
-        RF_protocol = atol(payload);            
+        RF_protocol = atoi(payload);            
     } else {
         RFcomplete = false;
         AddLogMessageI("Protocol value is missing in custom URL \n");
@@ -307,7 +307,7 @@ void custom(AsyncWebServerRequest *request) {
     if (request->hasParam("pulse")) {
         AsyncWebParameter* p = request->getParam("pulse");
         const char* payload = (p->value().c_str());
-        RF_pulse = atol(payload);
+        RF_pulse = atoi(payload);
     } else {
         RFcomplete = false;
         AddLogMessageI("Pulse value is missing in custom URL \n");

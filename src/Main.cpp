@@ -212,7 +212,10 @@ void loop() {
             } else {
                 digitalWrite(PHOTOMOS_GPIO_M5_pico, HIGH);
             }
+            mySwitch.setProtocol(atoi(RFProtocol));
+            mySwitch.setPulseLength(atoi(RFPulse));
             mySwitch.send(RFcode);
+            mySwitch.disableTransmit();
             AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(RFcode) + ")\n");
             if (strcmp(esp_board, "ESP_Wroom") == 0) {
                 digitalWrite(PHOTOMOS_GPIO_Wroom, LOW);
