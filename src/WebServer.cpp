@@ -292,20 +292,16 @@ void ringChime(AsyncWebServerRequest *request) {
     s += F("</h1><p>Ring request received</p>");
     request->send(200, "text/html", makePage(esp_name, s));
 
+    RFsend(RFcode);
     HTTP_Received("On");
     if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       //digitalWrite(13, HIGH);
        digitalWrite(PHOTOMOS_GPIO_Wroom, HIGH);
     } else {
-       //digitalWrite(22, HIGH);
        digitalWrite(PHOTOMOS_GPIO_M5_pico, HIGH);
     }
-    RFsend(RFcode);
     if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       //digitalWrite(13, LOW);
        digitalWrite(PHOTOMOS_GPIO_Wroom, LOW);
     } else {
-       //digitalWrite(22, LOW);
        digitalWrite(PHOTOMOS_GPIO_M5_pico, LOW);
     }
     if (!strcmp(SendOff, "yes")) {

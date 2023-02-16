@@ -40,7 +40,7 @@ bool Mqtt_Connect() {
 
     if (MqttClient.connected())
         return true;
-
+    
     if (MqttClient.connect(esp_name, ServerUser, ServerPass)) {
         AddLogMessageI("MQTT connected, subscribing to:" + String(MQTTsubscriber) + "\n");
         MqttClient.subscribe(MQTTsubscriber);

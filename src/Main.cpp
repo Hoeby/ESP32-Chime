@@ -41,7 +41,7 @@ char DomoticzIDX[5] = "999";                  // Domoticz IDX nummer welke gesch
 char SendOff[4] = "yes";                      // Send OFF command to Domoticz
 char RFProtocol[3] = "1";                     // Send RF protocol
 char RFPulse[5] = "500";                      // Send RF pulse
-char RFcode[33] = "";                         // Sedn RF code max 32 bits
+char RFcode[33] = "";                         // Send RF code max 32 bits
 char MQTTsubscriber[20] = "ESP32Chime/Input"; // MQTT MQTTsubscriber name
 char MQTTtopicin[20] = "domoticz/in";         // MQTT Topic name
 
@@ -218,8 +218,9 @@ void start_ssdp_service() {
 
 void RFsend(const char *State){
     delay(10);
-    //mySwitch.send(State);
-    mySwitch.send("00110000101111001101010110010011");
+
+    mySwitch.send(State);
+    //mySwitch.send("00110000101111001101010110010011");
     AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(State) + ")\n");
     delay(1000);
 }
