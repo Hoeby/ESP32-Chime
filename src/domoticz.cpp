@@ -12,6 +12,8 @@
 WiFiClient client;  // wifi client object
 MQTTClient MqttClient;
 
+bool mqtt_state = false;   // MQTT status
+
 //-4 : MQTT_CONNECTION_TIMEOUT - the server didn't respond within the keepalive time
 //-3 : MQTT_CONNECTION_LOST - the network connection was broken
 //-2 : MQTT_CONNECT_FAILED - the network connection failed
@@ -42,9 +44,11 @@ bool Mqtt_Connect() {
     if (MqttClient.connect(esp_name, ServerUser, ServerPass)) {
         AddLogMessageI("MQTT connected, subscribing to:" + String(MQTTsubscriber) + "\n");
         MqttClient.subscribe(MQTTsubscriber);
+        mqtt_state = true;
         return true;
     } else {
         AddLogMessageE("MQTT failed to connect! Err:" + String(MqttClient.lastError()) + "\n");
+        mqtt_state = false;
     }
     return false;
 }
@@ -165,7 +169,8 @@ bool Domoticz_MQTT_Switch(const char *Idx, const char *State) {
     MqttMessage += F(", \"switchcmd\": \"");
     MqttMessage += State;
     MqttMessage += F("\"}");
-    if (Mqtt_Connect()) {
+    if (mqtt_state) {
+    //if (Mqtt_Connect()) {
         String msg = F("mqtt publish t= ");
         msg += MQTTtopicin;
         msg += F(" m=");

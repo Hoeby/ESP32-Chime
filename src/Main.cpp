@@ -190,7 +190,8 @@ void loop() {
             AddLogMessageW(F("WiFi connection restored\n"));
         }
         // Process MQTT when selected
-        if (mqtt_initdone && (millis() > MQTT_lasttime + 500)) {
+        //if (mqtt_initdone && (millis() > MQTT_lasttime + 500)) {
+        if (mqtt_initdone && (millis() > MQTT_lasttime + 5000)) {
             Mqtt_Loop();
             MQTT_lasttime = millis();
         }
