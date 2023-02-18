@@ -33,6 +33,8 @@ bool EspConfig = false;  // target SPIFFS file config?
 bool ChimeConfig = false;  // target SPIFFS file config?
 bool tbin = false;       // target bin file?
 
+bool RFcomplete = true;              // If custom RF is complete, then RF activate
+
 bool _webAuth(AsyncWebServerRequest *request) {
     /*
     // Print header for debugging
@@ -284,31 +286,66 @@ void LogClean(AsyncWebServerRequest *request) {
 }
 
 void ringChime(AsyncWebServerRequest *request) {
+    //http://192.168.xxx.xxx/ring?protocol=2&pulse=712&code=00110000101111001101010110010011
+    RFcomplete = true;
     String msg = F("Ring request received");
     msg += F("\n");
     AddLogMessageI(msg);
+    
+    if (request->hasParam("protocol")) {
+        AsyncWebParameter* p = request->getParam("protocol");
+        const char* payload = (p->value().c_str());
+        strncpy(RF_protocol,payload,3);
+        AddLogMessageI("Custom RF protocol received. \n");
+    } else {
+        RFcomplete = false;
+        strncpy(RF_protocol,RFProtocol,3);
+    }
+    if (request->hasParam("pulse")) {
+        AsyncWebParameter* p = request->getParam("pulse");
+        const char* payload = (p->value().c_str());
+        strncpy(RF_pulselength,payload,5);
+        AddLogMessageI("Custom RF pulse received. \n");
+    } else {
+        RFcomplete = false;
+        strncpy(RF_pulselength,RFPulse,5);
+    }
+       if (request->hasParam("code")) {
+        AsyncWebParameter* p = request->getParam("code");
+        const char* payload = (p->value().c_str());
+        strncpy(RF_code,payload,33);
+        AddLogMessageI("Custom RF code received. \n");
+    } else {
+        RFcomplete = false;
+        strncpy(RF_code,RFcode,33);
+    }
+
     String s = F("<h1>");
     s += esp_name;
-    s += F("</h1><p>Ring request received</p>");
+    if (RFcomplete) {
+        s += F("</h1><p>Ring RF message received. <br>Protocol: ");
+    } else {
+        s += F("</h1><p>Ring request received. <br>Protocol: ");
+    }
+    s += String(RF_protocol);
+    s += F(",<br>Pulse: ");
+    s += String(RF_pulselength); 
+    s += F(",<br>Code: ");
+    s += String(RF_code);
+    s += F("</p>");        
     request->send(200, "text/html", makePage(esp_name, s));
+    if (strcmp(esp_board, "ESP_Wroom") == 0) {
+        RFsend(RCSWITCH_GPIO_Wroom, PHOTOMOS_GPIO_Wroom, RF_protocol, RF_pulselength, RF_code);
+    } else {
+        RFsend(RCSWITCH_GPIO_M5_pico, PHOTOMOS_GPIO_M5_pico, RF_protocol, RF_pulselength, RF_code);
+    }
 
-    RFsend(RFcode);
     HTTP_Received("On");
-    if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       digitalWrite(PHOTOMOS_GPIO_Wroom, HIGH);
-    } else {
-       digitalWrite(PHOTOMOS_GPIO_M5_pico, HIGH);
-    }
-    if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       digitalWrite(PHOTOMOS_GPIO_Wroom, LOW);
-    } else {
-       digitalWrite(PHOTOMOS_GPIO_M5_pico, LOW);
-    }
     if (!strcmp(SendOff, "yes")) {
         HTTP_Received("Off");
     } else {
         AddLogMessageI("OFF command to domoticz IDX is not send \n");
-        AddLogMessageI("Ringing chime: OFF \n");
+        AddLogMessageI("Ringing chime: Off \n");
     }
 }
 

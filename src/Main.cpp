@@ -71,6 +71,10 @@ bool mqtt_initdone = false;   // MQTT status
 bool reboot = false;          // Pending reboot status
 long rebootdelay = 0;         // used to calculate the delay
 
+char RF_protocol[3];          // RF Protocol
+char RF_pulselength[5];       // RF Pulse
+char RF_code[33];             // RF Code
+
 void setup() {
     //EEPROM.begin(200);
     Serial.begin(115200);
@@ -133,22 +137,11 @@ void setup() {
 
     // Set outputs
     if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       mySwitch.enableTransmit(RCSWITCH_GPIO_Wroom);
        pinMode(PHOTOMOS_GPIO_Wroom, OUTPUT);
     } else if (strcmp(esp_board, "M5stamp_pico") == 1) {
-       mySwitch.enableTransmit(RCSWITCH_GPIO_M5_pico);
        pinMode(PHOTOMOS_GPIO_M5_pico, OUTPUT);
-    } else {
-       mySwitch.enableTransmit(21);
-       pinMode(22, OUTPUT);
     }
-
-    //mySwitch.enableTransmit(RCSWITCH_GPIO_NUM);
-    int iRFProtocol = atoi(RFProtocol);
-    int iRFPulse = atoi(RFPulse); 
-    mySwitch.setProtocol(iRFProtocol);
-    mySwitch.setPulseLength(iRFPulse);
-           
+   
     // start mqtt
     if (!strcmp(SendProtocol, "mqtt")) {
         Mqtt_begin();
@@ -191,7 +184,7 @@ void loop() {
         }
         // Process MQTT when selected
         //if (mqtt_initdone && (millis() > MQTT_lasttime + 500)) {
-        if (mqtt_initdone && (millis() > MQTT_lasttime + 5000)) {
+        if (mqtt_initdone && (millis() > MQTT_lasttime + 1500)) {
             Mqtt_Loop();
             MQTT_lasttime = millis();
         }
@@ -216,11 +209,16 @@ void start_ssdp_service() {
     AddLogMessageI(F("SSDP started\n"));
 }
 
-void RFsend(const char *State){
+void RFsend(int Output, int Relay, const char *Protocol, const char *Pulselength, const char *Code){
+    //Protocol: 2, Pulse: 712, Code: 00110000101111001101010110010011
+    mySwitch.enableTransmit(Output);
+    digitalWrite(Relay, HIGH);
     delay(10);
-
-    mySwitch.send(State);
-    //mySwitch.send("00110000101111001101010110010011");
-    AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(State) + ")\n");
+    mySwitch.setProtocol(atoi(Protocol));
+    mySwitch.setPulseLength(atoi(Pulselength));
+    mySwitch.send(Code);
+    AddLogMessageI("RF Code send: (Protocol: " + String(Protocol) + ", Pulse: " + String(Pulselength) + ", Code: " + String(Code) + ")\n");
     delay(1000);
+    digitalWrite(Relay, LOW);
+    mySwitch.disableTransmit();
 }

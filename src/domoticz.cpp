@@ -170,15 +170,16 @@ bool Domoticz_MQTT_Switch(const char *Idx, const char *State) {
     MqttMessage += State;
     MqttMessage += F("\"}");
     if (mqtt_state) {
-    //if (Mqtt_Connect()) {
-        String msg = F("mqtt publish t= ");
-        msg += MQTTtopicin;
-        msg += F(" m=");
-        msg += MqttMessage;
-        msg += F("\n");
-        AddLogMessageI(msg);
-        MqttClient.publish(MQTTtopicin, ((char *)MqttMessage.c_str()));
-        return true;
+        //if (Mqtt_Connect()) {
+            String msg = F("mqtt publish t= ");
+            msg += MQTTtopicin;
+            msg += F(" m=");
+            msg += MqttMessage;
+            msg += F("\n");
+            AddLogMessageI(msg);
+            MqttClient.publish(MQTTtopicin, ((char *)MqttMessage.c_str()));
+            return true;
+        //}
     } else {
         AddLogMessageE(F("Mqtt not connected so Switch message not send!\n"));
         return false;

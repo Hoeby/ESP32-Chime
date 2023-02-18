@@ -38,12 +38,16 @@ extern bool reboot;
 extern long rebootdelay;
 extern bool mqtt_initdone;
 
+extern char RF_protocol[3];
+extern char RF_pulselength[5];
+extern char RF_code[33];
+
 extern int RCSWITCH_GPIO_Wroom;
 extern int PHOTOMOS_GPIO_Wroom;
 extern int RCSWITCH_GPIO_M5_pico;
 extern int PHOTOMOS_GPIO_M5_pico;
 
-void RFsend(const char *State);
+void RFsend(int Output, int Relay, const char *Protocol, const char *Pulselength, const char *Code );
 
 //-------------------------------------------------------
 // Global Functions
