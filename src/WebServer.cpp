@@ -299,6 +299,7 @@ void ringChime(AsyncWebServerRequest *request) {
         AddLogMessageI("OFF command to domoticz IDX is not send \n");
         AddLogMessageI("Ringing chime: OFF \n");
     }
+    AddLogMessageI("\n");
 }
 
 void LogDump(AsyncWebServerRequest *request) {
