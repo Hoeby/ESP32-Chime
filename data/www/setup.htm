@@ -23,16 +23,6 @@
                     </select>
                 </td>
             </tr>
-            <tr>
-                <td>ESP Board</td>
-                <td>
-                    <select id="esp_board" name="esp_board" onchange="ChangeBoard()">
-                        <option value="none">none</option>
-                        <option value="ESP_Wroom">ESP32_wroom</option>
-                        <option value="M5stamp_pico">M5Stamp_pico</option>
-                    </select>
-                </td>
-            </tr>
             
             <tr>
                 <td>ESP name:</td>
@@ -76,6 +66,14 @@
             <td bgcolor="#FFFFFF" style="line-height:10px;" colspan=3>&nbsp;</td>
             <tr>
                 <td>RF transmit settings</td>
+                <tr id="RCGPIO">
+                    <td>&nbsp;&nbsp;RCswitch GPIO:</td>
+                    <td><input name="RCSWITCH_GPIO" maxlength="3" size="3" value="%RCSWITCH_GPIO%"></td>
+                </tr>
+                <tr id="PHGPIO">
+                    <td>&nbsp;&nbsp;Photomos GPIO:</td>
+                    <td><input name="PHOTOMOS_GPIO" maxlength="3" size="3" value="%PHOTOMOS_GPIO%"></td>
+                </tr>
                 <tr id="RF1">
                     <td>&nbsp;&nbsp;RF protocol:</td>
                     <td><input name="RFProtocol" maxlength="3" size="3" value="%RFProtocol%"></td>
@@ -170,7 +168,6 @@
 
 <script language="javascript" type="text/javascript">
     var webloglevel = "%webloglevel%";
-    var esp_board = "%esp_board%";
     var IPsetting = "%IPsetting%";
     var SendProtocol = "%SendProtocol%";
     var SendOff = "%SendOff%";
@@ -180,11 +177,6 @@
         SetFields();
     }
 
-    function ChangeBoard() {
-        esp_board = document.getElementById('esp_board').value;
-        SetFields();
-    }
-    
     function ChangeProtocol() {
         SendProtocol = document.getElementById('Send_Protocol').value;
         SetFields();
@@ -206,15 +198,6 @@
             document.getElementById('webloglevel').getElementsByTagName('option')[3].selected = 'selected';
         else
             document.getElementById('webloglevel').getElementsByTagName('option')[4].selected = 'selected';
-
-        if (esp_board == "ESP_Wroom")
-            document.getElementById('esp_board').getElementsByTagName('option')[1].selected = 'selected';
-        else if (esp_board == "M5stamp_pico")
-            document.getElementById('esp_board').getElementsByTagName('option')[2].selected = 'selected';
-        else {
-            document.getElementById('esp_board').getElementsByTagName('option')[0].selected = 'selected';
-            document.getElementById("message").innerHTML = "<span style='color:red'><b> *** Select Esp-board Chime! ***</b></span>";
-        }
 
         if (IPsetting == "Fixed") {
             document.getElementById('IPsetting').getElementsByTagName('option')[1].selected = 'selected';
