@@ -12,7 +12,6 @@
 // Global variables defined in Main.cpp
 //-------------------------------------------------------
 extern uint webloglevel;
-extern char esp_board[20];
 extern char esp_name[20];
 extern char esp_uname[10];
 extern char esp_pass[20];
@@ -38,16 +37,10 @@ extern bool reboot;
 extern long rebootdelay;
 extern bool mqtt_initdone;
 
-extern char RF_protocol[3];
-extern char RF_pulselength[5];
-extern char RF_code[33];
+extern char RCSWITCH_GPIO[3];
+extern char PHOTOMOS_GPIO[3];
 
-extern int RCSWITCH_GPIO_Wroom;
-extern int PHOTOMOS_GPIO_Wroom;
-extern int RCSWITCH_GPIO_M5_pico;
-extern int PHOTOMOS_GPIO_M5_pico;
-
-void RFsend(int Output, int Relay, const char *Protocol, const char *Pulselength, const char *Code );
+void RFsend(const char *State);
 
 //-------------------------------------------------------
 // Global Functions
