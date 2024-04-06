@@ -33,11 +33,6 @@ bool EspConfig = false;  // target SPIFFS file config?
 bool ChimeConfig = false;  // target SPIFFS file config?
 bool tbin = false;       // target bin file?
 
-bool RFcustomprotocol = true;        // Is the RF protocol custom?
-bool RFcustompulse = true;           // Is the RF pulse custom?
-bool RFcustomcode = true;            // Is the RF code custom?
-bool RFcomplete = true;              // If custom RF is complete, then RF activate
-
 bool _webAuth(AsyncWebServerRequest *request) {
     /*
     // Print header for debugging
@@ -194,9 +189,6 @@ void ESPShowPagewithTemplate(AsyncWebServerRequest *request) {
         msg += F("Logout done\n");
         AddLogMessageD(msg);
         return;
-    } else if (page == "/info" && strcmp(esp_board,"none") == 0) {
-        // force setup page when ESP_board type isn't selected yet.
-        page = "/www/setup.htm";
     } else {
         page = "/www" + page + ".htm";
     }
@@ -289,113 +281,23 @@ void LogClean(AsyncWebServerRequest *request) {
 }
 
 void ringChime(AsyncWebServerRequest *request) {
-    //http://192.168.xxx.xxx/ring?protocol=2&pulse=712&code=00110000101111001101010110010011
-    RFcustomprotocol = true;
-    RFcustompulse = true;
-    RFcustomcode = true;
-    RFcomplete = true;
-    
-    if (request->hasParam("protocol")) {
-        AsyncWebParameter* p = request->getParam("protocol");
-        const char* payload = (p->value().c_str());
-        strncpy(RF_protocol,payload,3);
-        AddLogMessageI("Custom RF protocol received. \n");
-    } else {
-        RFcomplete = false;
-        RFcustomprotocol = false;
-    }
-    if (request->hasParam("pulse")) {
-        AsyncWebParameter* p = request->getParam("pulse");
-        const char* payload = (p->value().c_str());
-        strncpy(RF_pulselength,payload,5);
-        AddLogMessageI("Custom RF pulse received. \n");
-    } else {
-        RFcomplete = false;
-        RFcustompulse = false;
-    }
-    if (request->hasParam("code")) {
-        AsyncWebParameter* p = request->getParam("code");
-        const char* payload = (p->value().c_str());
-        strncpy(RF_code,payload,33);
-        AddLogMessageI("Custom RF code received. \n");
-    } else {
-        RFcomplete = false;
-        RFcustomcode = false;
-    }
-
+    String msg = F("Ring request received");
+    msg += F("\n");
+    AddLogMessageI(msg);
     String s = F("<h1>");
     s += esp_name;
-    if (RFcomplete) {
-        String msg = F("Custom request received");
-        msg += F("\n");
-        AddLogMessageI(msg);
-    
-        s += F("</h1><p>Custom RF message received. <br>Protocol: ");
-        s += String(RF_protocol);
-        s += F(",<br>Pulse: ");
-        s += String(RF_pulselength); 
-        s += F(",<br>Code: ");
-        s += String(RF_code);
-        s += F("</p>");        
-    } else {
-        if ((!RFcustomprotocol) && (!RFcustompulse) && (!RFcustompulse)) {
-            String msg = F("Ring request received");
-            msg += F("\n");
-            AddLogMessageI(msg);
-    
-            strncpy(RF_protocol,RFProtocol,3);
-            strncpy(RF_pulselength,RFPulse,5);
-            strncpy(RF_code,RFcode,33);
-            s += F("</h1><p>Ring request received. <br>Protocol: ");
-            s += String(RF_protocol);
-            s += F(",<br>Pulse: ");
-            s += String(RF_pulselength); 
-            s += F(",<br>Code: ");
-            s += String(RF_code);
-            s += F("</p>");        
-        } else {
-            String msg = F("Custom request received, but missing values.");
-            msg += F("\n");
-            AddLogMessageI(msg);
-    
-            s += F("</h1><p>Custom RF message received, but with errors. <br>Protocol: ");
-            if (!RFcustomprotocol) {
-                s += F("Error, Protocol value is missing in custom URL.");
-            } else {
-                s += String(RF_protocol);
-            }
-            s += F(",<br>Pulse: ");
-            if (!RFcustompulse) {
-                s += F("Error, Pulse value is missing in custom URL.");
-            } else {
-                s += String(RF_pulselength); 
-            }
-            s += F(",<br>Code: ");
-            if (!RFcustomcode) {
-                s += F("Error, RF code value is missing in custom URL.");
-            } else {
-                s += String(RF_code);
-            }
-            s += F("</p>");        
-        }
-    }
+    s += F("</h1><p>Ring request received</p>");
     request->send(200, "text/html", makePage(esp_name, s));
-    if ((RFcomplete) || ((!RFcustomprotocol) && (!RFcustompulse) && (!RFcustompulse)))  {
-        if (strcmp(esp_board, "ESP_Wroom") == 0) {
-            RFsend(RCSWITCH_GPIO_Wroom, PHOTOMOS_GPIO_Wroom, RF_protocol, RF_pulselength, RF_code);
-        } else {
-            RFsend(RCSWITCH_GPIO_M5_pico, PHOTOMOS_GPIO_M5_pico, RF_protocol, RF_pulselength, RF_code);
-        }
-    } else {
-        AddLogMessageI("No RF send, because missing values in custom URL. \n");
-    }
 
     HTTP_Received("On");
+    digitalWrite(atoi(PHOTOMOS_GPIO), HIGH);
+    RFsend(RFcode);
+    digitalWrite(atoi(PHOTOMOS_GPIO), LOW);
     if (!strcmp(SendOff, "yes")) {
         HTTP_Received("Off");
     } else {
         AddLogMessageI("OFF command to domoticz IDX is not send \n");
-        AddLogMessageI("Ringing chime: Off \n");
+        AddLogMessageI("Ringing chime: OFF \n");
     }
 }
 
