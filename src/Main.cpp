@@ -16,8 +16,7 @@ const char BUILD_MAIN[] = __DATE__ " " __TIME__;
 //**************************************************************************************************************************************************
 uint webloglevel = 3;                         // loglevel to show in WebConsole. 0-5
 
-char esp_board[20] = "none";                  // ESP type selection
-char esp_name[20] = "ESP Chime";              // Wifi SSID waarop ESP32-chime zich moet aanmelden.
+char esp_name[20] = "ESP-Chime";              // Wifi SSID waarop ESP32-chime zich moet aanmelden.
 char esp_uname[10] = "admin";                 // Username voor weblogin.
 char esp_pass[20] = "admin";                  // Bijbehorend wachtwoord voor SSID & Weblogin, moet min 8 characters zijn voor WifiManager
 
@@ -41,14 +40,12 @@ char DomoticzIDX[5] = "999";                  // Domoticz IDX nummer welke gesch
 char SendOff[4] = "yes";                      // Send OFF command to Domoticz
 char RFProtocol[3] = "1";                     // Send RF protocol
 char RFPulse[5] = "500";                      // Send RF pulse
-char RFcode[33] = "";                         // Send RF code max 32 bits
+char RFcode[33] = "";                         // Sedn RF code max 32 bits
 char MQTTsubscriber[20] = "ESP32Chime/Input"; // MQTT MQTTsubscriber name
 char MQTTtopicin[20] = "domoticz/in";         // MQTT Topic name
 
-int RCSWITCH_GPIO_Wroom = 12;                 // Set the rcswitch GPIO pin, ESP WROOM
-int PHOTOMOS_GPIO_Wroom = 13;                 // Set the photomos GPIO pin, ESP WROOM
-int RCSWITCH_GPIO_M5_pico = 21;               // Set the rcswitch GPIO pin, ESP M5stamp-pico
-int PHOTOMOS_GPIO_M5_pico = 22;               // Set the photomos GPIO pin, ESP M5stamp-pico
+char RCSWITCH_GPIO[3] = "";                   // This GPIO outputs the RFPulse
+char PHOTOMOS_GPIO[3] = "";                   // To use for a pulse, or a photomos to disconnect the RFPulse line
 
 //**************************************************************************************************************************************************
 //**                                                                END SETTINGS END                                                              **
@@ -71,10 +68,6 @@ bool mqtt_initdone = false;   // MQTT status
 bool reboot = false;          // Pending reboot status
 long rebootdelay = 0;         // used to calculate the delay
 
-char RF_protocol[3];          // RF Protocol
-char RF_pulselength[5];       // RF Pulse
-char RF_code[33];             // RF Code
-
 void setup() {
     //EEPROM.begin(200);
     Serial.begin(115200);
@@ -82,7 +75,8 @@ void setup() {
 
     // Initialize SPIFFS
     if (!SPIFFS.begin(true))
-        ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");
+        AddLogMessageW(F("An Error has occurred while mounting SPIFFS.\n"));
+        //ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");
 
     // restore previous ESP saved settings
     Restore_ESPConfig_from_SPIFFS();
@@ -90,11 +84,7 @@ void setup() {
     //WiFiManager
     //Local intialization. Once its business is done, there is no need to keep it around
     AsyncWiFiManager wifiManager(&webserver, &dns);
-    //reset saved settings
-    //  wifiManager.resetSettings();
-    // Previous line doesn't always work so this is another option to erase the EEPROM and all saved settings
-    //  pio run --target erase
-
+    
     // Set hardcoded IP Settings when Fixed IP is defined
     if (strcmp(IPsetting, "Fixed") == 0) {
         AddLogMessageI(F("==>Set Static IP\n"));
@@ -136,12 +126,14 @@ void setup() {
     }
 
     // Set outputs
-    if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       pinMode(PHOTOMOS_GPIO_Wroom, OUTPUT);
-    } else if (strcmp(esp_board, "M5stamp_pico") == 1) {
-       pinMode(PHOTOMOS_GPIO_M5_pico, OUTPUT);
-    }
-   
+    mySwitch.enableTransmit(atoi(RCSWITCH_GPIO));
+    pinMode(atoi(PHOTOMOS_GPIO), OUTPUT);
+    
+    int iRFProtocol = atoi(RFProtocol);
+    int iRFPulse = atoi(RFPulse); 
+    mySwitch.setProtocol(iRFProtocol);
+    mySwitch.setPulseLength(iRFPulse);
+           
     // start mqtt
     if (!strcmp(SendProtocol, "mqtt")) {
         Mqtt_begin();
@@ -183,8 +175,7 @@ void loop() {
             AddLogMessageW(F("WiFi connection restored\n"));
         }
         // Process MQTT when selected
-        //if (mqtt_initdone && (millis() > MQTT_lasttime + 500)) {
-        if (mqtt_initdone && (millis() > MQTT_lasttime + 1500)) {
+        if (mqtt_initdone && (millis() > MQTT_lasttime + 500)) {
             Mqtt_Loop();
             MQTT_lasttime = millis();
         }
@@ -193,14 +184,14 @@ void loop() {
     }
 
     // short pause
-    delay(10);
+    delay(9);
 }
 
 void start_ssdp_service() {
     //initialize mDNS service
     //Define SSDP and model name
     const char *SSDP_Name = esp_name;
-    const char *modelName = esp_board;
+    const char *modelName = "ESP32";
     const char *nVersion = BUILD_MAIN;
     const char *SerialNumber = "";
     const char *Manufacturer = "ESP32Chime";
@@ -209,16 +200,9 @@ void start_ssdp_service() {
     AddLogMessageI(F("SSDP started\n"));
 }
 
-void RFsend(int Output, int Relay, const char *Protocol, const char *Pulselength, const char *Code){
-    //Protocol: 2, Pulse: 712, Code: 00110000101111001101010110010011
-    mySwitch.enableTransmit(Output);
-    digitalWrite(Relay, HIGH);
+void RFsend(const char *State){
     delay(10);
-    mySwitch.setProtocol(atoi(Protocol));
-    mySwitch.setPulseLength(atoi(Pulselength));
-    mySwitch.send(Code);
-    AddLogMessageI("RF Code send: (Protocol: " + String(Protocol) + ", Pulse: " + String(Pulselength) + ", Code: " + String(Code) + ")\n");
+    mySwitch.send(RFcode);
+    AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(State) + ")\n");
     delay(1000);
-    digitalWrite(Relay, LOW);
-    mySwitch.disableTransmit();
 }
