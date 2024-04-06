@@ -189,9 +189,6 @@ void ESPShowPagewithTemplate(AsyncWebServerRequest *request) {
         msg += F("Logout done\n");
         AddLogMessageD(msg);
         return;
-    } else if (page == "/info" && strcmp(esp_board,"none") == 0) {
-        // force setup page when ESP_board type isn't selected yet.
-        page = "/www/setup.htm";
     } else {
         page = "/www" + page + ".htm";
     }
@@ -293,21 +290,9 @@ void ringChime(AsyncWebServerRequest *request) {
     request->send(200, "text/html", makePage(esp_name, s));
 
     HTTP_Received("On");
-    if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       //digitalWrite(13, HIGH);
-       digitalWrite(PHOTOMOS_GPIO_Wroom, HIGH);
-    } else {
-       //digitalWrite(22, HIGH);
-       digitalWrite(PHOTOMOS_GPIO_M5_pico, HIGH);
-    }
+    digitalWrite(atoi(PHOTOMOS_GPIO), HIGH);
     RFsend(RFcode);
-    if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       //digitalWrite(13, LOW);
-       digitalWrite(PHOTOMOS_GPIO_Wroom, LOW);
-    } else {
-       //digitalWrite(22, LOW);
-       digitalWrite(PHOTOMOS_GPIO_M5_pico, LOW);
-    }
+    digitalWrite(atoi(PHOTOMOS_GPIO), LOW);
     if (!strcmp(SendOff, "yes")) {
         HTTP_Received("Off");
     } else {

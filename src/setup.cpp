@@ -82,7 +82,6 @@ bool Restore_ESPConfig_from_SPIFFS() {
         return false;
     }
     GetJsonField("webloglevel", doc, &webloglevel);
-    GetJsonField("esp_board", doc, esp_board);
     GetJsonField("esp_name", doc, esp_name);
     GetJsonField("esp_uname", doc, esp_uname);
     GetJsonField("esp_pass", doc, esp_pass);
@@ -98,6 +97,8 @@ bool Restore_ESPConfig_from_SPIFFS() {
     GetJsonField("ServerPass", doc, ServerPass);
     GetJsonField("DomoticzIDX", doc, DomoticzIDX);
     GetJsonField("SendOff", doc, SendOff);
+    GetJsonField("RCSWITCH_GPIO", doc, RCSWITCH_GPIO);
+    GetJsonField("PHOTOMOS_GPIO", doc, PHOTOMOS_GPIO);
     GetJsonField("RFProtocol", doc, RFProtocol);
     GetJsonField("RFPulse", doc, RFPulse);
     GetJsonField("RFcode", doc, RFcode);
@@ -128,6 +129,8 @@ void Save_NewESPConfig_to_SPIFFS(AsyncWebServerRequest *request) {
     p += sprintf(p, "\"ServerPass\":\"%s\",", urlDecode(request->arg("ServerPass")).c_str());
     p += sprintf(p, "\"DomoticzIDX\":\"%s\",", urlDecode(request->arg("DomoticzIDX")).c_str());
     p += sprintf(p, "\"SendOff\":\"%s\",", urlDecode(request->arg("SendOff")).c_str());
+    p += sprintf(p, "\"RCSWITCH_GPIO\":\"%s\",", urlDecode(request->arg("RCSWITCH_GPIO")).c_str());
+    p += sprintf(p, "\"PHOTOMOS_GPIO\":\"%s\",", urlDecode(request->arg("PHOTOMOS_GPIO")).c_str());
     p += sprintf(p, "\"RFProtocol\":\"%s\",", urlDecode(request->arg("RFProtocol")).c_str());
     p += sprintf(p, "\"RFPulse\":\"%s\",", urlDecode(request->arg("RFPulse")).c_str());
     p += sprintf(p, "\"RFcode\":\"%s\",", urlDecode(request->arg("RFcode")).c_str());
@@ -162,26 +165,8 @@ String TranslateTemplateVars(const String &var) {
     }
     if (var == "VERSION_MAJOR")
         return VERSION;
-    if (var == "esp_board")
-        return esp_board;
-    if (var == "RCSWITCH_GPIO") {
-        if (strcmp(esp_board, "ESP_Wroom") == 0) {
-            return F("12");
-        } else {
-            return F("21");
-        }
-    }   
-    if (var == "PHOTOMOS_GPIO") {
-        if (strcmp(esp_board, "ESP_Wroom") == 0) {
-            return F("13");
-        } else {
-            return F("22");
-        }
-    }   
     if (var == "webloglevel")
         return String(webloglevel);
-    if (var == "esp_board")
-        return esp_board;
     if (var == "esp_name")
         return esp_name;
     if (var == "esp_uname")
@@ -212,6 +197,10 @@ String TranslateTemplateVars(const String &var) {
         return DomoticzIDX;
     if (var == "SendOff")
         return SendOff;
+    if (var == "RCSWITCH_GPIO")
+        return RCSWITCH_GPIO;
+    if (var == "PHOTOMOS_GPIO")
+        return PHOTOMOS_GPIO;        
     if (var == "RFProtocol")
         return RFProtocol;
     if (var == "RFPulse")

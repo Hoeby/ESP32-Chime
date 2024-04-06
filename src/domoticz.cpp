@@ -45,6 +45,7 @@ bool Mqtt_Connect() {
         return true;
     } else {
         AddLogMessageE("MQTT failed to connect! Err:" + String(MqttClient.lastError()) + "\n");
+        delay(5000);
     }
     return false;
 }
@@ -86,7 +87,7 @@ String process_messageReceived(String payload) {
     JsonObject root = doc.as<JsonObject>();
     for (JsonPair kv : root) {
         const char *key = kv.key().c_str();
-        const char *value = kv.value().as<char *>();
+        const char *value = kv.value().as<const char *>();
         Serial.printf("key:%s  value:%s", key, value);
         if (strcasecmp(key, "led") == 0) {
             AddLogMessageI(String("Switch LED to ") + String(value) + "\n");

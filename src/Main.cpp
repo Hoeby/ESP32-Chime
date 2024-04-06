@@ -16,8 +16,7 @@ const char BUILD_MAIN[] = __DATE__ " " __TIME__;
 //**************************************************************************************************************************************************
 uint webloglevel = 3;                         // loglevel to show in WebConsole. 0-5
 
-char esp_board[20] = "none";                  // ESP type selection
-char esp_name[20] = "ESP Chime";              // Wifi SSID waarop ESP32-chime zich moet aanmelden.
+char esp_name[20] = "ESP-Chime";              // Wifi SSID waarop ESP32-chime zich moet aanmelden.
 char esp_uname[10] = "admin";                 // Username voor weblogin.
 char esp_pass[20] = "admin";                  // Bijbehorend wachtwoord voor SSID & Weblogin, moet min 8 characters zijn voor WifiManager
 
@@ -45,10 +44,8 @@ char RFcode[33] = "";                         // Sedn RF code max 32 bits
 char MQTTsubscriber[20] = "ESP32Chime/Input"; // MQTT MQTTsubscriber name
 char MQTTtopicin[20] = "domoticz/in";         // MQTT Topic name
 
-int RCSWITCH_GPIO_Wroom = 12;                 // Set the rcswitch GPIO pin, ESP WROOM
-int PHOTOMOS_GPIO_Wroom = 13;                 // Set the photomos GPIO pin, ESP WROOM
-int RCSWITCH_GPIO_M5_pico = 21;               // Set the rcswitch GPIO pin, ESP M5stamp-pico
-int PHOTOMOS_GPIO_M5_pico = 22;               // Set the photomos GPIO pin, ESP M5stamp-pico
+char RCSWITCH_GPIO[3] = "";                   // This GPIO outputs the RFPulse
+char PHOTOMOS_GPIO[3] = "";                   // To use for a pulse, or a photomos to disconnect the RFPulse line
 
 //**************************************************************************************************************************************************
 //**                                                                END SETTINGS END                                                              **
@@ -78,7 +75,8 @@ void setup() {
 
     // Initialize SPIFFS
     if (!SPIFFS.begin(true))
-        ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");
+        AddLogMessageW(F("An Error has occurred while mounting SPIFFS.\n"));
+        //ESP_LOGE(TAG, "An Error has occurred while mounting SPIFFS");
 
     // restore previous ESP saved settings
     Restore_ESPConfig_from_SPIFFS();
@@ -86,11 +84,7 @@ void setup() {
     //WiFiManager
     //Local intialization. Once its business is done, there is no need to keep it around
     AsyncWiFiManager wifiManager(&webserver, &dns);
-    //reset saved settings
-    //  wifiManager.resetSettings();
-    // Previous line doesn't always work so this is another option to erase the EEPROM and all saved settings
-    //  pio run --target erase
-
+    
     // Set hardcoded IP Settings when Fixed IP is defined
     if (strcmp(IPsetting, "Fixed") == 0) {
         AddLogMessageI(F("==>Set Static IP\n"));
@@ -132,18 +126,9 @@ void setup() {
     }
 
     // Set outputs
-    if (strcmp(esp_board, "ESP_Wroom") == 0) {
-       mySwitch.enableTransmit(RCSWITCH_GPIO_Wroom);
-       pinMode(PHOTOMOS_GPIO_Wroom, OUTPUT);
-    } else if (strcmp(esp_board, "M5stamp_pico") == 1) {
-       mySwitch.enableTransmit(RCSWITCH_GPIO_M5_pico);
-       pinMode(PHOTOMOS_GPIO_M5_pico, OUTPUT);
-    } else {
-       mySwitch.enableTransmit(21);
-       pinMode(22, OUTPUT);
-    }
-
-    //mySwitch.enableTransmit(RCSWITCH_GPIO_NUM);
+    mySwitch.enableTransmit(atoi(RCSWITCH_GPIO));
+    pinMode(atoi(PHOTOMOS_GPIO), OUTPUT);
+    
     int iRFProtocol = atoi(RFProtocol);
     int iRFPulse = atoi(RFPulse); 
     mySwitch.setProtocol(iRFProtocol);
@@ -199,14 +184,14 @@ void loop() {
     }
 
     // short pause
-    delay(10);
+    delay(9);
 }
 
 void start_ssdp_service() {
     //initialize mDNS service
     //Define SSDP and model name
     const char *SSDP_Name = esp_name;
-    const char *modelName = esp_board;
+    const char *modelName = "ESP32";
     const char *nVersion = BUILD_MAIN;
     const char *SerialNumber = "";
     const char *Manufacturer = "ESP32Chime";
@@ -217,8 +202,7 @@ void start_ssdp_service() {
 
 void RFsend(const char *State){
     delay(10);
-    //mySwitch.send(State);
-    mySwitch.send("00110000101111001101010110010011");
+    mySwitch.send(RFcode);
     AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(State) + ")\n");
     delay(1000);
 }
