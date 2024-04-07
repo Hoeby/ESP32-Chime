@@ -208,7 +208,6 @@ void RFsend(const char *State){
 }
 
 void CustomRFsend(const char *Output, const char *Relay, const char *Protocol, const char *Pulselength, const char *Code){
-    //Protocol: 2, Pulse: 712, Code: 00110000101111001101010110010011
     //mySwitch.enableTransmit(atoi(Output));
     digitalWrite(atoi(Relay), HIGH);
     delay(10);
