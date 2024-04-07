@@ -37,7 +37,7 @@ char ServerPort[5] = "8080";                  // Domoticz Server poort adres.
 char ServerUser[16] = "";                     // MQTT username
 char ServerPass[16] = "";                     // MQTT password
 char DomoticzIDX[5] = "999";                  // Domoticz IDX nummer welke geschakeld moet worden.
-char SendOff[4] = "yes";                      // Send OFF command to Domoticz
+char SendOff[4] = "no";                       // Send OFF command to Domoticz
 char RFProtocol[3] = "1";                     // Send RF protocol
 char RFPulse[5] = "500";                      // Send RF pulse
 char RFcode[33] = "";                         // Sedn RF code max 32 bits
@@ -205,4 +205,18 @@ void RFsend(const char *State){
     mySwitch.send(RFcode);
     AddLogMessageI("RF Code send: (Protocol: " + String(RFProtocol) + ", Pulse: " + String(RFPulse) + ", Code: " + String(State) + ")\n");
     delay(1000);
+}
+
+void CustomRFsend(const char *Output, const char *Relay, const char *Protocol, const char *Pulselength, const char *Code){
+    //Protocol: 2, Pulse: 712, Code: 00110000101111001101010110010011
+    //mySwitch.enableTransmit(atoi(Output));
+    digitalWrite(atoi(Relay), HIGH);
+    delay(10);
+    mySwitch.setProtocol(atoi(Protocol));
+    mySwitch.setPulseLength(atoi(Pulselength));
+    mySwitch.send(Code);
+    AddLogMessageI("Custom RF Code send: (Protocol: " + String(Protocol) + ", Pulse: " + String(Pulselength) + ", Code: " + String(Code) + ")\n");
+    delay(1000);
+    digitalWrite(atoi(Relay), LOW);
+    //mySwitch.disableTransmit();
 }

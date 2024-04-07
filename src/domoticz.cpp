@@ -111,7 +111,7 @@ void HTTP_Received(const char *State) {
     } else if (!strcmp(SendProtocol, "mqtt")) {
         Domoticz_MQTT_Switch(DomoticzIDX, State);
     } else {
-        AddLogMessageW(F("SendProtocol = \"none\", No command to send\n"));
+        AddLogMessageW(F("SendProtocol Domoticz = \"none\", No command to send\n"));
     }
 }
 

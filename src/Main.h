@@ -41,6 +41,4 @@ extern char RCSWITCH_GPIO[3];
 extern char PHOTOMOS_GPIO[3];
 
 void RFsend(const char *State);
-
-//-------------------------------------------------------
-// Global Functions
+void CustomRFsend(const char *Output, const char *Relay, const char *Protocol, const char *Pulselength, const char *Code );

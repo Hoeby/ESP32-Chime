@@ -19,30 +19,25 @@ String makePage(String title, String contents);
 
 AsyncWebSocket ws("/ws");
 uint LogId = 999;
-String LogMessage[50];  // amount of messages to log
+String LogMessage[50];                 // amount of messages to log
 uint LogMessageIndexI = 0;
 uint LogMessageIndexO = 0;
 bool LogMessageSuccess = false;
-unsigned long LogMessage_Send_time;  // time a logmessage was send.
-uint LogMessage_Send_tries = 0;      // number of tries.
-bool LogMessage_NewLine = true;      // remember wether the last line had a \n
+unsigned long LogMessage_Send_time;    // time a logmessage was send.
+uint LogMessage_Send_tries = 0;        // number of tries.
+bool LogMessage_NewLine = true;        // remember wether the last line had a \n
 
-String tfile;            // target SPIFFS file
-File hfile;              // target SPIFFS file handle
-bool EspConfig = false;  // target SPIFFS file config?
-bool ChimeConfig = false;  // target SPIFFS file config?
-bool tbin = false;       // target bin file?
+String tfile;                          // target SPIFFS file
+File hfile;                            // target SPIFFS file handle
+bool EspConfig = false;                // target SPIFFS file config?
+bool ChimeConfig = false;              // target SPIFFS file config?
+bool tbin = false;                     // target bin file?
+
+char CustomRfProtocol[3] = "";         // Send RF protocol
+char CustomRfPulse[5] = "";            // Send RF pulse
+char CustomRfCode[33] = "";            // Send RF code max 32 bits
 
 bool _webAuth(AsyncWebServerRequest *request) {
-    /*
-    // Print header for debugging
-    Serial.printf("url:%s Headers: %s:\n", request->url().c_str(), String(request->headers()).c_str());
-    for (uint i = 0; i < request->headers(); i++)
-    {
-        Serial.printf(" %i  %s=%s\n", i, request->headerName(i).c_str(), request->header(i).c_str());
-    }
-    //
-    */
     if (!request->authenticate(esp_uname, esp_pass, NULL, false)) {
         request->requestAuthentication(NULL, false);  // force basic auth
         return false;
@@ -126,7 +121,8 @@ void WebServerInit(AsyncWebServer *webserver) {
     webserver->on("/ConfigFileUploads", HTTP_POST, [](AsyncWebServerRequest *request) { request->send(200); }, ConfigFileUploads);
 
     // CHIME links
-    webserver->on("/ring", HTTP_GET, ringChime);
+    webserver->on("/ring", HTTP_GET, RingChime);
+    webserver->on("/customring", HTTP_GET, CustomRingChime);
 
     // serving other static information from SPIFFS
     webserver->serveStatic("/", SPIFFS, "/www/");
@@ -280,7 +276,7 @@ void LogClean(AsyncWebServerRequest *request) {
     request->send(200, "text/html", makePage(esp_name, s));
 }
 
-void ringChime(AsyncWebServerRequest *request) {
+void RingChime(AsyncWebServerRequest *request) {
     String msg = F("Ring request received");
     msg += F("\n");
     AddLogMessageI(msg);
@@ -298,6 +294,85 @@ void ringChime(AsyncWebServerRequest *request) {
     } else {
         AddLogMessageI("OFF command to domoticz IDX is not send \n");
         AddLogMessageI("Ringing chime: OFF \n");
+    }
+    AddLogMessageI("\n");
+}
+
+void CustomRingChime(AsyncWebServerRequest *request) {
+    //string example: http://192.168.xxx.xxx/customring?protocol=2&pulse=712&code=00110000101111001101010110010011
+    bool CustomRfComplete = false;
+    bool CustomProtocol = false;
+    bool CustomPulse = false;
+    bool CustomCode = false;
+    String msg = F("Custom ring request received");
+    msg += F("\n");
+    AddLogMessageI(msg);
+    
+    if (request->hasParam("protocol")) {
+        AsyncWebParameter* p = request->getParam("protocol");
+        const char* payload = (p->value().c_str());
+        strncpy(CustomRfProtocol,payload,3);
+        CustomProtocol = true;
+    }
+    if (request->hasParam("pulse")) {
+        AsyncWebParameter* p = request->getParam("pulse");
+        const char* payload = (p->value().c_str());
+        strncpy(CustomRfPulse,payload,5);
+        CustomPulse = true;
+    }
+    if (request->hasParam("code")) {
+        AsyncWebParameter* p = request->getParam("code");
+        const char* payload = (p->value().c_str());
+        strncpy(CustomRfCode,payload,33);
+        CustomCode = true;
+    }
+
+    if (CustomProtocol && CustomPulse && CustomCode) {
+        String s = F("<h1>");
+        s += esp_name;
+        s += F("</h1><p>Custom Ring RF message received. <br>Protocol: ");
+        s += String(CustomRfProtocol);
+        s += F(",<br>Pulse: ");
+        s += String(CustomRfPulse); 
+        s += F(",<br>Code: ");
+        s += String(CustomRfCode);
+        s += F("</p>");        
+        request->send(200, "text/html", makePage(esp_name, s));
+        CustomRFsend(RCSWITCH_GPIO, PHOTOMOS_GPIO, CustomRfProtocol, CustomRfPulse, CustomRfCode);
+    
+        HTTP_Received("On");
+        if (!strcmp(SendOff, "yes")) {
+            HTTP_Received("Off");
+        } else {
+            AddLogMessageI("OFF command to domoticz IDX is not send \n");
+            AddLogMessageI("Custom ringing chime: Off \n");
+        }
+    } else {
+        String s = F("<h1>");
+        s += esp_name;
+        s += F("</h1><p>Custom Ring RF message received. <br>Protocol:");
+        if (CustomProtocol) {
+            s += String(CustomRfProtocol);
+        } else {
+            s += F("no valid protocol data.");
+            AddLogMessageI("No valid protocol data in custom ring. \n");
+        }
+        s += F(",<br>Pulse: ");
+        if (CustomPulse) {
+            s += String(CustomRfPulse); 
+        } else {
+            s += F("no valid pulse data.");
+            AddLogMessageI("No valid pulse data in custom ring. \n");
+        }
+        s += F(",<br>Code: ");
+        if (CustomCode) {
+            s += String(CustomRfCode);
+        } else {
+            s += F("no valid code data.");
+            AddLogMessageI("No valid code data in custom ring. \n");
+        }
+        s += F("</p>");        
+        request->send(200, "text/html", makePage(esp_name, s));
     }
 }
 
