@@ -17,6 +17,12 @@
             <p style="color:blue">URL's that are supported by the ESP Chime</p>
             <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chime ring</dt>
             <dd>- When user/password empty: http://%ipaddr%/ring</dd> 
+            <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chime custom ring</dt>
+            <dd>This option can be used to send a http string with the data, required data:</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&#x2022; rcswitch library supported protocol</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&#x2022; rcswitch library supported pulse</dd>
+            <dd>&nbsp;&nbsp;&nbsp;&#x2022; rcswitch library supported code</dd>
+            <dd>- When user/password empty: http://%ipaddr%/customring?protocol=2&pulse=712&code=00110000101111001101010110010011</dd>
             <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chime reboot</dt>
             <dd>- When user/password empty: http://%ipaddr%/reboot</dd>
         </dl>
