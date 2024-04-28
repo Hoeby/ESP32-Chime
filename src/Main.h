@@ -35,7 +35,7 @@ extern char MQTTtopicin[20];
 extern const char BUILD_MAIN[];
 extern bool reboot;
 extern long rebootdelay;
-extern bool mqtt_initdone;
+extern bool mqttOK;
 
 extern char RCSWITCH_GPIO[3];
 extern char PHOTOMOS_GPIO[3];
