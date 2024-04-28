@@ -23,6 +23,8 @@ MQTTClient MqttClient;
 // 4 : MQTT_CONNECT_BAD_CREDENTIALS - the username/password were rejected
 // 5 : MQTT_CONNECT_UNAUTHORIZED -
 
+unsigned long MQTT_error = 0;  // MQTT check lasttime
+
 void Mqtt_begin() {
     if (strcmp(SendProtocol, "mqtt") != 0)
         return;
@@ -34,22 +36,20 @@ void Mqtt_begin() {
 
 bool Mqtt_Connect() {
     if (strcmp(SendProtocol, "mqtt") != 0)
-        mqttOK = false;
         return false;
 
     if (MqttClient.connected())
-        mqttOK = true;
         return true;
 
     if (MqttClient.connect(esp_name, ServerUser, ServerPass)) {
         AddLogMessageI("MQTT connected, subscribing to:" + String(MQTTsubscriber) + "\n");
         MqttClient.subscribe(MQTTsubscriber);
-        mqttOK = true;
         return true;
     } else {
-        AddLogMessageE("MQTT failed to connect! Err:" + String(MqttClient.lastError()) + "\n");
-        mqttOK = false;
-        delay(10000);
+        if (millis() > MQTT_error + 10000) {
+            AddLogMessageE("MQTT failed to connect! Err:" + String(MqttClient.lastError()) + "\n");
+            MQTT_error = millis();
+        }
     }
     return false;
 }
@@ -165,24 +165,22 @@ bool Domoticz_JSON_Switch(const char *Idx, const char *State) {
 }
 
 bool Domoticz_MQTT_Switch(const char *Idx, const char *State) {
-    if (mqttOK) {
-        String MqttMessage = F("{\"command\": \"switchlight\", \"idx\": ");
-        MqttMessage += String(Idx);
-        MqttMessage += F(", \"switchcmd\": \"");
-        MqttMessage += State;
-        MqttMessage += F("\"}");
-        if (Mqtt_Connect()) {
-          String msg = F("mqtt publish t= ");
-          msg += MQTTtopicin;
-          msg += F(" m=");
-          msg += MqttMessage;
-          msg += F("\n");
-          AddLogMessageI(msg);
-          MqttClient.publish(MQTTtopicin, ((char *)MqttMessage.c_str()));
+    String MqttMessage = F("{\"command\": \"switchlight\", \"idx\": ");
+    MqttMessage += String(Idx);
+    MqttMessage += F(", \"switchcmd\": \"");
+    MqttMessage += State;
+    MqttMessage += F("\"}");
+    if (Mqtt_Connect()) {
+        String msg = F("mqtt publish t= ");
+        msg += MQTTtopicin;
+        msg += F(" m=");
+        msg += MqttMessage;
+        msg += F("\n");
+        AddLogMessageI(msg);
+        MqttClient.publish(MQTTtopicin, ((char *)MqttMessage.c_str()));
         return true;
-        } else {
-          AddLogMessageE(F("Mqtt not connected so Switch message not send!\n"));
-          return false;
-        }
+    } else {
+        AddLogMessageE(F("Mqtt not connected so Switch message not send!\n"));
+        return false;
     }
 }

@@ -64,7 +64,7 @@ RCSwitch mySwitch = RCSwitch();
 
 unsigned long MQTT_lasttime;  // MQTT check lasttime
 bool WifiOK = false;          // WiFi status
-bool mqttOK = false;          // MQTT status
+bool mqtt_initdone = false;   // MQTT status
 bool reboot = false;          // Pending reboot status
 long rebootdelay = 0;         // used to calculate the delay
 
@@ -137,7 +137,7 @@ void setup() {
     // start mqtt
     if (!strcmp(SendProtocol, "mqtt")) {
         Mqtt_begin();
-        mqttOK = true;
+        mqtt_initdone = true;
     }
     MQTT_lasttime = millis();
 
@@ -175,7 +175,7 @@ void loop() {
             AddLogMessageW(F("WiFi connection restored\n"));
         }
         // Process MQTT when selected
-        if (mqttOK && (millis() > MQTT_lasttime + 500)) {
+        if (mqtt_initdone && (millis() > MQTT_lasttime + 500)) {
             Mqtt_Loop();
             MQTT_lasttime = millis();
         }
