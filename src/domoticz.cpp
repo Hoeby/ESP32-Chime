@@ -23,6 +23,8 @@ MQTTClient MqttClient;
 // 4 : MQTT_CONNECT_BAD_CREDENTIALS - the username/password were rejected
 // 5 : MQTT_CONNECT_UNAUTHORIZED -
 
+unsigned long MQTT_error = 0;  // MQTT check lasttime
+
 void Mqtt_begin() {
     if (strcmp(SendProtocol, "mqtt") != 0)
         return;
@@ -44,8 +46,10 @@ bool Mqtt_Connect() {
         MqttClient.subscribe(MQTTsubscriber);
         return true;
     } else {
-        AddLogMessageE("MQTT failed to connect! Err:" + String(MqttClient.lastError()) + "\n");
-        delay(5000);
+        if (millis() > MQTT_error + 10000) {
+            AddLogMessageE("MQTT failed to connect! Err:" + String(MqttClient.lastError()) + "\n");
+            MQTT_error = millis();
+        }
     }
     return false;
 }
@@ -109,7 +113,7 @@ void HTTP_Received(const char *State) {
     if (!strcmp(SendProtocol, "json")) {
         Domoticz_JSON_Switch(DomoticzIDX, State);
     } else if (!strcmp(SendProtocol, "mqtt")) {
-        Domoticz_MQTT_Switch(DomoticzIDX, State);
+          Domoticz_MQTT_Switch(DomoticzIDX, State);
     } else {
         AddLogMessageW(F("SendProtocol Domoticz = \"none\", No command to send\n"));
     }
